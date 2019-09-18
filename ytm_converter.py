@@ -24,6 +24,7 @@ class YouTubeMixConverter:
                 try:
                     clip = mp.VideoFileClip(full_video_path)
                     clip.audio.write_audiofile(full_audio_path)
+                    clip.close()
                     print("Converted file", full_video_path, "to", full_audio_path)
                 except OSError:
                     print("Could not convert file", full_video_path)
