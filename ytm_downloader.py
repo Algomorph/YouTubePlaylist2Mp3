@@ -43,7 +43,7 @@ class YouTubeMixDownloader:
 
 
 def main():
-    playlist_url = "https://www.youtube.com/watch?v=HS3ke0jx_so&list=PLoDNvK0-oocmKUJPaHxn-QuqYP3OWlVLU"
+    playlist_url = "https://www.youtube.com/playlist?list=PLoDNvK0-oocmKUJPaHxn-QuqYP3OWlVLU"
     download_path = "Instrumental Mix"
     mode = "resume"
 
