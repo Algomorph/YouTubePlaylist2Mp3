@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+import argparse
 import sys
 import os
 import os.path
@@ -31,14 +32,20 @@ class YouTubeMixConverter:
                     print("Could not convert file", full_video_path)
                     errored_on_files.append(full_video_path)
         print("Converted {:d} of {:d} videos successfully.".format(len(video_files) - len(errored_on_files),
-                                                               len(video_files)))
+                                                                   len(video_files)))
         print("Errored on: ")
         for errored_file in errored_on_files:
             print(errored_file)
 
 
 def main():
-    convert_folder_path = "Instrumental Mix"
+    parser = argparse.ArgumentParser("A simple script that converts all .mp4 files in a given folder to mp3 format ("
+                                     "without erasing the originals) and saves these .mp3 files to the same folder ("
+                                     "overwriting, if necessary).")
+    parser.add_argument("--path", "-p", type=str, help="Path to the folder where the files need to be converted.",
+                        default="Instrumental Mix")
+    args = parser.parse_args()
+    convert_folder_path = args.path
 
     converter = YouTubeMixConverter(convert_folder_path)
     converter.convert()

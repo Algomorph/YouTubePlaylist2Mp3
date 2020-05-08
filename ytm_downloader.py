@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 import sys
 import os
-import os.path
 import shutil
+import argparse
 
 import pytube
 
@@ -20,6 +20,8 @@ class YouTubeMixDownloader:
             self.download_overwrite()
         elif mode == "resume":
             self.download_resume()
+        else:
+            raise ValueError("Unrecognized mode: {:s}".format(mode))
 
     def download_resume(self):
         if os.path.exists(self.download_path):
@@ -43,9 +45,20 @@ class YouTubeMixDownloader:
 
 
 def main():
-    playlist_url = "https://www.youtube.com/playlist?list=PLoDNvK0-oocmKUJPaHxn-QuqYP3OWlVLU"
-    download_path = "Instrumental Mix"
-    mode = "resume"
+    parser = argparse.ArgumentParser("A simple script that downloads an entire YouTube playlist as a set of mp4 video "
+                                     "files.")
+    parser.add_argument("--playlist_url", "-p", type=str, help="URL of playlist to download from",
+                        default="https://www.youtube.com/playlist?list=PLoDNvK0-oocmKUJPaHxn-QuqYP3OWlVLU")
+    parser.add_argument("--output_path", "-o", type=str, help="Path on disk where the downloaded files will be placed",
+                        default="Instrumental Mix")
+    parser.add_argument("--mode", "-m", type=str,
+                        help="Defines program behavior. The 'resume' mode will not overwrite or try to download files "
+                             "that are already there, 'overwrite' will overwrite them.",
+                        default='resume')
+    args = parser.parse_args()
+    playlist_url = args.playlist_url
+    download_path = args.output_path
+    mode = args.mode
 
     downloader = YouTubeMixDownloader(playlist_url, download_path)
     downloader.download(mode)

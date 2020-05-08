@@ -4,6 +4,10 @@
 # Default download folder(s)
 Instrumental\ Mix/
 
+# Downloaded & converted files:
+*.mp4
+*.mp3
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
