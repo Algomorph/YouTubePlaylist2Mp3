@@ -3,6 +3,7 @@ import sys
 import os
 import shutil
 import argparse
+import re
 
 import pytube
 
@@ -14,6 +15,7 @@ class YouTubeMixDownloader:
     def __init__(self, playlist_url, download_path):
         self.download_path = download_path
         self.playlist = pytube.Playlist(playlist_url)
+        # self.playlist._video_regex = re.compile(r"\"url\":\"(/watch\?v=[\w-]*)")
 
     def download(self, mode):
         if mode == "overwrite":
@@ -28,7 +30,6 @@ class YouTubeMixDownloader:
             existing_video_files = []
             for filename in os.listdir(self.download_path):
                 existing_video_files.append(filename)
-            self.playlist.populate_video_urls()
             for url in self.playlist.video_urls:
                 video = pytube.YouTube(url)
                 if not video.streams.first().default_filename in existing_video_files:
