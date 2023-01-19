@@ -15,7 +15,7 @@ class YouTubeMixConverter:
         self.convert_folder_path = convert_folder_path
 
     def convert(self):
-        video_files = [filename for filename in os.listdir(self.convert_folder_path) if filename.endswith(".mp4")]
+        video_files = [filename for filename in os.listdir(self.convert_folder_path) if filename.endswith(".mp4") or filename.endswith(".3gpp")]
         errored_on_files = []
         for video_filename in video_files:
             full_video_path = os.path.join(self.convert_folder_path, video_filename)
@@ -39,7 +39,7 @@ class YouTubeMixConverter:
 
 
 def main():
-    parser = argparse.ArgumentParser("A simple script that converts all .mp4 files in a given folder to mp3 format ("
+    parser = argparse.ArgumentParser("A simple script that converts all .mp4/3gpp files in a given folder to mp3 format ("
                                      "without erasing the originals) and saves these .mp3 files to the same folder ("
                                      "overwriting, if necessary).")
     parser.add_argument("--path", "-p", type=str, help="Path to the folder where the files need to be converted.",

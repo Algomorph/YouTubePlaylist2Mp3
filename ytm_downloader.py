@@ -4,6 +4,8 @@ import os
 import shutil
 import argparse
 import re
+from random import random
+from time import sleep
 
 import pytube
 
@@ -12,12 +14,15 @@ PROGRAM_STATUS_SUCCESS = 0
 
 class YouTubeMixDownloader:
 
-    def __init__(self, playlist_url, download_path):
+    def __init__(self, playlist_url: str, download_path: str, verbosity: int):
         self.download_path = download_path
         self.playlist = pytube.Playlist(playlist_url)
+        self.verbosity = verbosity
         # self.playlist._video_regex = re.compile(r"\"url\":\"(/watch\?v=[\w-]*)")
 
     def download(self, mode):
+        if self.verbosity > 0:
+            print(f"Downloading in '{mode}' mode to directory {self.download_path}")
         if mode == "overwrite":
             self.download_overwrite()
         elif mode == "resume":
@@ -34,7 +39,11 @@ class YouTubeMixDownloader:
                 video = pytube.YouTube(url)
                 if not video.streams.first().default_filename in existing_video_files:
                     video.streams.first().download(self.download_path)
-
+                    if self.verbosity > 0:
+                        print(f"Downloaded {video.streams.first().default_filename}.")
+                    sleep(random()*2 + 1)
+                else:
+                    print(f"Skipping over {video.streams.first().default_filename} (already in destination).")
         else:
             self.download_overwrite()
 
@@ -42,7 +51,12 @@ class YouTubeMixDownloader:
         if os.path.exists(self.download_path):
             shutil.rmtree(self.download_path)
         os.mkdir(self.download_path)
-        self.playlist.download_all(self.download_path)
+        # self.playlist.download_all(self.download_path)
+        for video in self.playlist.videos:
+            video.streams.first().download(self.download_path)
+            sleep(random()*2 + 1)
+            if self.verbosity > 0:
+                print(f"Downloaded {video.streams.first().default_filename}.")
 
 
 def main():
@@ -56,12 +70,14 @@ def main():
                         help="Defines program behavior. The 'resume' mode will not overwrite or try to download files "
                              "that are already there, 'overwrite' will overwrite them.",
                         default='resume')
+    parser.add_argument("--verbosity", "-v", type=int, default=0,
+                        help="Level of output verbosity. Default is 0, meaning no output.")
     args = parser.parse_args()
     playlist_url = args.playlist_url
     download_path = args.output_path
     mode = args.mode
 
-    downloader = YouTubeMixDownloader(playlist_url, download_path)
+    downloader = YouTubeMixDownloader(playlist_url, download_path, args.verbosity)
     downloader.download(mode)
 
     return PROGRAM_STATUS_SUCCESS
