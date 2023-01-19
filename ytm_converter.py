@@ -33,9 +33,10 @@ class YouTubeMixConverter:
                     errored_on_files.append(full_video_path)
         print("Converted {:d} of {:d} videos successfully.".format(len(video_files) - len(errored_on_files),
                                                                    len(video_files)))
-        print("Errored on: ")
-        for errored_file in errored_on_files:
-            print(errored_file)
+        if len(errored_on_files) > 0:
+            print("Errored on: ")
+            for errored_file in errored_on_files:
+                print(errored_file)
 
 
 def main():
