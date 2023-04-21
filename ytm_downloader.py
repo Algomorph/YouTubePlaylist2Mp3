@@ -4,10 +4,15 @@ import os
 import shutil
 import argparse
 import re
+from http.client import RemoteDisconnected, InvalidURL
 from random import random
 from time import sleep
+from urllib.error import HTTPError
+from xmlrpc.client import ProtocolError
 
 import pytube
+from pytube.exceptions import VideoUnavailable, AgeRestrictedError, VideoRegionBlocked, LiveStreamError, \
+    RecordingUnavailable, MembersOnly, VideoPrivate
 
 PROGRAM_STATUS_SUCCESS = 0
 
@@ -37,13 +42,31 @@ class YouTubeMixDownloader:
                 existing_video_files.append(filename)
             for url in self.playlist.video_urls:
                 video = pytube.YouTube(url)
-                if not video.streams.first().default_filename in existing_video_files:
-                    video.streams.first().download(self.download_path)
-                    if self.verbosity > 0:
-                        print(f"Downloaded {video.streams.first().default_filename}.")
-                    sleep(random()*2 + 1)
-                else:
-                    print(f"Skipping over {video.streams.first().default_filename} (already in destination).")
+                try:
+                    if not video.streams.get_highest_resolution().default_filename in existing_video_files:
+                        try:
+                            video.streams.get_highest_resolution().download(self.download_path)
+                        except (
+                        VideoUnavailable, HTTPError, ConnectionError, RemoteDisconnected, InvalidURL, ProtocolError,
+                        AgeRestrictedError, VideoRegionBlocked, LiveStreamError, RecordingUnavailable, MembersOnly,
+                        VideoPrivate, Exception):
+                            try:
+                                video.streams.get_highest_resolution().download(self.download_path)
+                            except (VideoUnavailable, HTTPError, ConnectionError, RemoteDisconnected, InvalidURL,
+                                    ProtocolError, AgeRestrictedError, VideoRegionBlocked, LiveStreamError,
+                                    RecordingUnavailable, MembersOnly, VideoPrivate, Exception) as exception:
+                                f"Error while downloading {video.streams.get_highest_resolution().default_filename} (Skipping).\n " \
+                                f"Exception: {exception}."
+                        if self.verbosity > 0:
+                            print(f"Downloaded {video.streams.get_highest_resolution().default_filename}.")
+                        sleep(random() * 2 + 1)
+                    else:
+                        print(f"Skipping over {video.streams.get_highest_resolution().default_filename} (already in destination).")
+                except KeyError as exception:
+                    print(f"Skipping over video 'http://youtube.com/watch?v={video.video_id}'. Exception: {exception}. "
+                          f"This may be caused by the video being age-restricted. Try downloading through other tools"
+                          f" until corresponding PyTube package error is resolved (bug status:"
+                          f" https://github.com/pytube/pytube/issues/1542).")
         else:
             self.download_overwrite()
 
@@ -54,7 +77,7 @@ class YouTubeMixDownloader:
         # self.playlist.download_all(self.download_path)
         for video in self.playlist.videos:
             video.streams.first().download(self.download_path)
-            sleep(random()*2 + 1)
+            sleep(random() * 2 + 1)
             if self.verbosity > 0:
                 print(f"Downloaded {video.streams.first().default_filename}.")
 
