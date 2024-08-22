@@ -10,8 +10,8 @@ from time import sleep
 from urllib.error import HTTPError
 from xmlrpc.client import ProtocolError
 
-import pytube
-from pytube.exceptions import VideoUnavailable, AgeRestrictedError, VideoRegionBlocked, LiveStreamError, \
+import pytubefix as pytube
+from pytubefix.exceptions import VideoUnavailable, AgeRestrictedError, VideoRegionBlocked, LiveStreamError, \
     RecordingUnavailable, MembersOnly, VideoPrivate
 
 PROGRAM_STATUS_SUCCESS = 0
