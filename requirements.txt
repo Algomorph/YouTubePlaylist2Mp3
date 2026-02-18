@@ -1,3 +1,4 @@
-pytube @ git+https://github.com/pytube/pytube@master
+# pytube @ git+https://github.com/pytube/pytube@master
+pytubefix @ git+https://github.com/JuanBindez/pytubefix@main
 moviepy
 imageio
